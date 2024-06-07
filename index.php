@@ -2,6 +2,7 @@
 
 require_once 'vendor/autoload.php';
 
+use GuzzleHttp\Client;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableCellStyle;
@@ -14,11 +15,12 @@ $searchQuery = urlencode($input);
 $resource_id = "25e80bf3-f107-4ab4-89ef-251b5b9374e9";
 $url = "https://data.gov.lv/dati/lv/api/3/action/datastore_search?q=$searchQuery&resource_id=$resource_id";
 
-$companies = json_decode(file_get_contents($url));
 
-if (empty($companies)) {
-    exit("Failed to fetch data. Please try again later.\n");
-}
+$client = new Client();
+$response = $client->request('GET', $url);
+
+$companies = $response->getBody();
+$companies = json_decode($companies);
 
 $records = $companies->result->records;
 
